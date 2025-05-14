@@ -1,0 +1,14 @@
+version: "3"
+
+services: 
+  patient-service:
+    build: 
+      ./patient-service
+    ports:
+      - "8000:8000"
+
+  appointment-service:
+    build: 
+      ./appointment-service
+    ports:
+      - "8001:8001"
