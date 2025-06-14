@@ -12,8 +12,8 @@ appointments = []
 
 @router.post("")  # Cambiar de "/" a ""
 def create_appointment(data: dict, user=Depends(require_role(["paciente", "medico"]))):
-    print("🟢 Data recibida:", data)
-    print("🟢 Usuario:", user)
+    print(" Data recibida:", data)
+    print(" Usuario:", user)
     
     try:
         appointment = {
@@ -25,13 +25,13 @@ def create_appointment(data: dict, user=Depends(require_role(["paciente", "medic
             "reason": data["reason"],
             "created_by": user.get("preferred_username", "desconocido")  # usa .get()
         }
-        print("🟢 Cita a guardar:", appointment)
+        print(" Cita a guardar:", appointment)
         appointments.append(appointment)
         send_event("appointments", appointment)
         return appointment
     except Exception as e:
         import traceback
-        print("🔥 ERROR EN CREAR CITA:", traceback.format_exc())
+        print(" ERROR EN CREAR CITA:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Error interno al crear cita")
 
 @router.get("")  # Cambiar de "/" a ""

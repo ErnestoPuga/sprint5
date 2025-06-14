@@ -106,7 +106,7 @@ class KafkaClient:
         """Close Kafka producer"""
         if self.producer:
             self.producer.close()
-            logger.info("🔐 Kafka producer closed")
+            logger.info(" Kafka producer closed")
 
 # Global instance
 kafka_client = KafkaClient()
