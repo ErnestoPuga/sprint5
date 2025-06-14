@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from uuid import uuid4
 from app.security.jwt_auth import require_role
 from app.kafka_client import send_event
 
@@ -9,9 +10,37 @@ patients = {
     "p002": {"id": "p002", "name": "Luis Gómez", "age": 51}
 }
 
-@router.get("/{patient_id}")
-def get_patient(patient_id: str, user=Depends(require_role(["admin", "medico"]))):
-    patient = patients.get(patient_id, {"message": "Paciente no encontrado"})
-    # Enviar evento de consulta a Kafka (opcional, ejemplo)
-    send_event("patient_queries", {"patient_id": patient_id, "requested_by": user["username"]})
-    return patient
+@router.post("")
+def create_patient(data: dict, user=Depends(require_role(["admin", "medico"]))):
+    try:
+        patient_id = f"p{str(uuid4())[:4]}"
+        patient = {
+            "id": patient_id,
+            "name": data["name"],
+            "age": data["age"],
+            "created_by": user.get("preferred_username", "desconocido")
+        }
+        patients[patient_id] = patient
+
+        # Emitir evento Kafka
+        send_event("patient_created", patient)
+
+        return {
+            "message": "Paciente creado exitosamente",
+            "patient": patient,
+            "status": "success"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al crear el paciente")
+
+@router.get("")
+def list_patients(user=Depends(require_role(["admin", "medico"]))):
+    """Listar todos los pacientes"""
+    try:
+        return {
+            "patients": list(patients.values()),
+            "total": len(patients),
+            "status": "success"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")

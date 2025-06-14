@@ -1,4 +1,4 @@
-version: "3.8"
+
 services:
   patient-service:
     build: ./patient-service
@@ -77,6 +77,15 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+
+  alert-consumer:
+    build: ./alert-service
+    command: python app/appointment_consumer.py
+    depends_on:
+      - kafka
+    networks:
+      - app-network
+
 
 networks:
   app-network:

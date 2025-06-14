@@ -27,7 +27,7 @@ def create_appointment(data: dict, user=Depends(require_role(["paciente", "medic
         }
         print(" Cita a guardar:", appointment)
         appointments.append(appointment)
-        send_event("appointments", appointment)
+        send_event("appointment_created", appointment)
         return appointment
     except Exception as e:
         import traceback
