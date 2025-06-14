@@ -1,3 +1,5 @@
 fastapi
 uvicorn
-python-jose
+python-jose[cryptography]
+requests
+kafka-python
